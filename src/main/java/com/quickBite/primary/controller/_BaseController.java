@@ -1,9 +1,6 @@
 package com.quickBite.primary.controller;
 
-import com.quickBite.primary.service.AuthService;
-import com.quickBite.primary.service.BannerService;
-import com.quickBite.primary.service.SettingService;
-import com.quickBite.primary.service.VendorService;
+import com.quickBite.primary.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -16,5 +13,6 @@ public class _BaseController {
     @Autowired protected SettingService settingService;
     @Autowired protected BannerService bannerService;
     @Autowired protected VendorService vendorService;
+    @Autowired protected RestaurantService restaurantService;
 
 }

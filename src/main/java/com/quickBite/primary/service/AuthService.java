@@ -1,8 +1,10 @@
 package com.quickBite.primary.service;
 
+import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.dto.AuthDto;
 import com.quickBite.primary.pojo.UserAdmin;
+import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.primary.pojo._BaseUser;
 import com.quickBite.security.JwtTokenUtil;
 import com.quickBite.utils.TextUtils;
@@ -42,6 +44,14 @@ public class AuthService extends _BaseService {
         userAdmin.setLastLogin(LocalDateTime.now());
         userAdminRepository.save(userAdmin);
         return generateAuthTokenAndGetUserDetails(userAdmin, ipAddress);
+    }
+
+    public AuthDto.UserDetails loginVendor(String userName, String password, String ipAddress) throws BadRequestException {
+        Vendor vendor = SpringBeanContext.getBean(VendorService.class).findByUsername(userName);
+        validateUser(vendor, password);
+        vendor.setLastLogin(LocalDateTime.now());
+        vendorRepository.save(vendor);
+        return generateAuthTokenAndGetUserDetails(vendor, ipAddress);
     }
 
 //    public AuthDto.UserDetails loginCustomer(String userName, String password, String ipAddress) throws BadRequestException {

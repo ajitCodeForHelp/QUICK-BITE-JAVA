@@ -26,15 +26,15 @@ public class AuthController extends _BaseController {
                 .build(), HttpStatus.OK);
     }
 
-//    @PostMapping("/vendor-login")
-//    public ResponseEntity<ResponsePacket> vendorLogin(HttpServletRequest request, @Valid @RequestBody AuthDto.VendorLogin login)
-//            throws BadRequestException {
-//        AuthDto.UserDetails userClientDetail = authTrade.loginClient(login.getUserName(), login.getPassword(), request.getRemoteAddr());
-//        return new ResponseEntity<>(ResponsePacket.builder()
-//                .errorCode(0)
-//                .message("Login Successfully.")
-//                .responsePacket(userClientDetail)
-//                .build(), HttpStatus.OK);
-//    }
+    @PostMapping("/vendor-login")
+    public ResponseEntity<ResponsePacket> vendorLogin(HttpServletRequest request, @Valid @RequestBody AuthDto.VendorLogin login)
+            throws BadRequestException {
+        AuthDto.UserDetails userClientDetail = authService.loginVendor(login.getUserName(), login.getPassword(), request.getRemoteAddr());
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("Login Successfully.")
+                .responsePacket(userClientDetail)
+                .build(), HttpStatus.OK);
+    }
 
 }
