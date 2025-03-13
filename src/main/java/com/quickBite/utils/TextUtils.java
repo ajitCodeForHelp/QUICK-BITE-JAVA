@@ -22,6 +22,24 @@ public class TextUtils {
         if (id == null) return null;
         return id.toString();
     }
+
+    public static List<ObjectId> toObjectIds(List<String> ids) {
+        if (isEmpty(ids)) return null;
+        List<ObjectId> objectIds = new ArrayList<>();
+        for (String id : ids) {
+            objectIds.add(new ObjectId(id));
+        }
+        return objectIds;
+    }
+
+    public static List<String> toStringIds(List<ObjectId> ids) {
+        if (ids == null) return null;
+        List<String> stringIds = new ArrayList<>();
+        for (ObjectId id : ids) {
+            stringIds.add(id.toString());
+        }
+        return stringIds;
+    }
     public static String generate4DigitOTP() {
         if (true) {
             return "9999";

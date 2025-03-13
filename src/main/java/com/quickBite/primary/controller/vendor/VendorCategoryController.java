@@ -19,7 +19,7 @@ public class VendorCategoryController extends _BaseController {
     public ResponseEntity<ResponsePacket> save(@Valid @RequestBody CategoryDto.CreateCategory request) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.save")
+                .message("Category Saved Successfully.")
                 .responsePacket(categoryService.save(request))
                 .build(), HttpStatus.OK);
     }
@@ -29,7 +29,7 @@ public class VendorCategoryController extends _BaseController {
         categoryService.update(id, request);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.update")
+                .message("Category Updated Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -37,7 +37,7 @@ public class VendorCategoryController extends _BaseController {
     protected ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Get Category Data Successfully.")
                 .responsePacket(categoryService.get(id))
                 .build(), HttpStatus.OK);
     }
@@ -46,7 +46,7 @@ public class VendorCategoryController extends _BaseController {
     protected ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get Category List Data Successfully.")
                 .responsePacket(categoryService.list(data))
                 .build(), HttpStatus.OK);
     }
@@ -56,7 +56,7 @@ public class VendorCategoryController extends _BaseController {
         categoryService.activate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Category Activate Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -65,7 +65,7 @@ public class VendorCategoryController extends _BaseController {
         categoryService.inactivate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.inactive")
+                .message("Category InActive Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -73,7 +73,7 @@ public class VendorCategoryController extends _BaseController {
     protected ResponseEntity<ResponsePacket> categoryKeyValueList() throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get List Data Successfully.")
                 .responsePacket(categoryService.categoryKeyValueList())
                 .build(), HttpStatus.OK);
     }
@@ -82,7 +82,7 @@ public class VendorCategoryController extends _BaseController {
     protected ResponseEntity<ResponsePacket> parentKeyValueList() throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get List Data Successfully.")
                 .responsePacket(categoryService.parentCategoryKeyValueList())
                 .build(), HttpStatus.OK);
     }
@@ -91,7 +91,7 @@ public class VendorCategoryController extends _BaseController {
     protected ResponseEntity<ResponsePacket> subCategoryKeyValueList() throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get List Data Successfully.")
                 .responsePacket(categoryService.subCategoryKeyValueList())
                 .build(), HttpStatus.OK);
     }

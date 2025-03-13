@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApi30Config {
-    private final String moduleName="Kpis Food Restaurant";
-    private final String apiVersion="2.0";
+    private final String moduleName="Quick Bite Application";
+    private final String apiVersion="1.0";
 
 //    public OpenApi30Config(
 //            @Value("${module-name}") String moduleName,

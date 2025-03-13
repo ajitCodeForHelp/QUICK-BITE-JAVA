@@ -18,6 +18,9 @@ public class Vendor extends _BaseUser {
     private Database databaseDetail;
     private ContactDetail contactDetail;
 
+    // Restaurant Limit Vendor Can Make
+    private Integer restaurantLimit = 1;
+
 
     @Setter
     @Getter

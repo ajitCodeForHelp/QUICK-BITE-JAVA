@@ -27,6 +27,7 @@ public class RestaurantService extends _BaseService {
     public String save(RestaurantDto.CreateRestaurant request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
+        validateRestaurantLimit(mongoTemplate, loggedInUser);
         Restaurant restaurant = new Restaurant();
         restaurant.setVendorId(loggedInUser.getObjectId());
         restaurant.setSeqId(getBean(PrimarySequenceRepository.class).getNextSequenceId(Restaurant.class.getSimpleName() + "_" + loggedInUser.getSeqId()));
@@ -93,14 +94,26 @@ public class RestaurantService extends _BaseService {
         restaurant.setModifiedAt(LocalDateTime.now());
         mongoTemplate.save(restaurant);
     }
+    public String getMyRestaurantId() throws BadRequestException {
+        Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
+        MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
+        Restaurant restaurant = findByVendorId(mongoTemplate, loggedInUser.getObjectId());
+        // return RestaurantMapper.MAPPER.mapToDetailDto(restaurant);
+        return restaurant.getId();
+    }
+    private Restaurant findByVendorId(MongoTemplate mongoTemplate, ObjectId vendorId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("vendorId").is(vendorId));
+        return mongoTemplate.findOne(query, Restaurant.class);
+    }
 
-    public List<Restaurant> findByActive(MongoTemplate mongoTemplate, boolean active) {
+    private List<Restaurant> findByActive(MongoTemplate mongoTemplate, boolean active) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(active));
         return mongoTemplate.find(query, Restaurant.class);
     }
 
-    public List<Restaurant> findAll(MongoTemplate mongoTemplate) {
+    private List<Restaurant> findAll(MongoTemplate mongoTemplate) {
         return mongoTemplate.findAll(Restaurant.class);
     }
 
@@ -112,6 +125,15 @@ public class RestaurantService extends _BaseService {
             throw new BadRequestException("Restaurant Record Not Exist.");
         }
         return restaurant;
+    }
+
+    public void validateRestaurantLimit(MongoTemplate mongoTemplate, Vendor vendor) throws BadRequestException {
+        Query query = new Query()
+                .addCriteria(Criteria.where("vendorId").is(vendor.getObjectId()));
+        long restaurantCount = mongoTemplate.count(query, Restaurant.class);
+        if (restaurantCount >= vendor.getRestaurantLimit()) {
+            throw new BadRequestException("Can't Create New Restaurant, Please Contact To Admin");
+        }
     }
 
 }

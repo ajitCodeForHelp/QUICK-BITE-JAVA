@@ -23,7 +23,7 @@ public class AdminBannerController extends _BaseController {
         UserAdmin loggedInUser = (UserAdmin) SpringBeanContext.getBean(JwtUserDetailsService.class).getLoggedInUser();
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.save")
+                .message("Banner Saved Successfully.")
                 .responsePacket(bannerService.save(banner))
                 .build(), HttpStatus.OK);
     }
@@ -33,7 +33,7 @@ public class AdminBannerController extends _BaseController {
         bannerService.update(id, banner);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.update")
+                .message("Banner Updated Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -41,7 +41,7 @@ public class AdminBannerController extends _BaseController {
     protected ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Get Banner Data Successfully.")
                 .responsePacket(bannerService.get(id))
                 .build(), HttpStatus.OK);
     }
@@ -50,7 +50,7 @@ public class AdminBannerController extends _BaseController {
     protected ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get List Data Successfully.")
                 .responsePacket(bannerService.list(data))
                 .build(), HttpStatus.OK);
     }
@@ -60,7 +60,7 @@ public class AdminBannerController extends _BaseController {
         bannerService.activate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Banner Activate Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class AdminBannerController extends _BaseController {
         bannerService.inactivate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.inactive")
+                .message("Banner InActivate Successfully.")
                 .build(), HttpStatus.OK);
     }
 

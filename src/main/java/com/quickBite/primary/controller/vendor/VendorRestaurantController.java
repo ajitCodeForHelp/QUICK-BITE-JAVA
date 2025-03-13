@@ -19,7 +19,7 @@ public class VendorRestaurantController extends _BaseController {
     public ResponseEntity<ResponsePacket> save(@Valid @RequestBody RestaurantDto.CreateRestaurant request) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.save")
+                .message("Restaurant Saved Successfully.")
                 .responsePacket(restaurantService.save(request))
                 .build(), HttpStatus.OK);
     }
@@ -29,7 +29,7 @@ public class VendorRestaurantController extends _BaseController {
         restaurantService.update(id, request);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.update")
+                .message("Restaurant Updated Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -37,7 +37,7 @@ public class VendorRestaurantController extends _BaseController {
     protected ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Get Data Successfully.")
                 .responsePacket(restaurantService.get(id))
                 .build(), HttpStatus.OK);
     }
@@ -46,7 +46,7 @@ public class VendorRestaurantController extends _BaseController {
     protected ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.get_all")
+                .message("Get List Successfully.")
                 .responsePacket(restaurantService.list(data))
                 .build(), HttpStatus.OK);
     }
@@ -56,7 +56,7 @@ public class VendorRestaurantController extends _BaseController {
         restaurantService.activate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.active")
+                .message("Restaurant Active Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -65,7 +65,7 @@ public class VendorRestaurantController extends _BaseController {
         restaurantService.inactivate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.inactive")
+                .message("Restaurant Inactive Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -74,7 +74,16 @@ public class VendorRestaurantController extends _BaseController {
         restaurantService.restaurantOnOff(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("ecommerce.common.message.inactive")
+                .message("Restaurant Status Updated.")
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/get-my-restaurant-id")
+    protected ResponseEntity<ResponsePacket> getMyRestaurantId() throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("Get Data Successfully.")
+                .responsePacket(restaurantService.getMyRestaurantId())
                 .build(), HttpStatus.OK);
     }
 
