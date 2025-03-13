@@ -4,10 +4,7 @@ import com.quickBite.bean.DataTableResponsePacket;
 import com.quickBite.configuration.MultiMongoDBFactory;
 import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.exception.BadRequestException;
-import com.quickBite.primary.repository.BannerRepository;
-import com.quickBite.primary.repository.SettingRepository;
-import com.quickBite.primary.repository.UserAdminRepository;
-import com.quickBite.primary.repository.VendorRepository;
+import com.quickBite.primary.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,7 +17,9 @@ public class _BaseService {
     @Autowired protected SettingRepository settingRepository;
     @Autowired protected BannerRepository bannerRepository;
     @Autowired protected VendorRepository vendorRepository;
-
+    @Autowired protected CustomerRepository customerRepository;
+    @Autowired protected OneTimePasswordRepository oneTimePasswordRepository;
+    @Autowired protected AppCodeRepository appCodeRepository;
 
     protected DataTableResponsePacket getDataTableResponsePacket(Page pageData, List data) {
         DataTableResponsePacket responsePacket = new DataTableResponsePacket();

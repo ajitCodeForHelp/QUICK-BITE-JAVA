@@ -145,4 +145,10 @@ public class CategoryService extends _BaseService {
         return category;
     }
 
+    public List<Category> findByIds(MongoTemplate mongoTemplate, ObjectId restaurantId, List<ObjectId> ids) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
+                .addCriteria(Criteria.where("id").in(ids));
+        return mongoTemplate.find(query, Category.class);
+    }
 }

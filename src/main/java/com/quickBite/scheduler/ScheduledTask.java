@@ -1,6 +1,7 @@
 package com.quickBite.scheduler;
 
 import com.quickBite.configuration.SpringBeanContext;
+import com.quickBite.primary.service.MenuDataService;
 import com.quickBite.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,22 +28,41 @@ public class ScheduledTask {
     private static boolean Every1MinuteSchedulerState = false;
 
 
-    @Scheduled(cron = "0 */1 * * * *")
-    public void every1MinuteScheduler() {
+//    @Scheduled(cron = "0 */1 * * * *")
+//    public void every1MinuteScheduler() {
+//        if (scheduler.equalsIgnoreCase("OFF")) {
+//            return;
+//        }
+//        log.info("every1MinuteScheduler() at {}", DateUtils.getFormattedDateTime(new Date()));
+//        if (Every1MinuteSchedulerState) {
+//            return;
+//        }
+//        Every1MinuteSchedulerState = true;
+//        try {
+//         SpringBeanContext.getBean(MenuDataService.class).buildMenuForAllVendor();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        Every1MinuteSchedulerState = false;
+//    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void everyDayScheduler() {
         if (scheduler.equalsIgnoreCase("OFF")) {
             return;
         }
-        log.info("every1MinuteScheduler() at {}", DateUtils.getFormattedDateTime(new Date()));
+        log.info("everyDayScheduler() at {}", DateUtils.getFormattedDateTime(new Date()));
         if (Every1MinuteSchedulerState) {
             return;
         }
         Every1MinuteSchedulerState = true;
         try {
-//            SpringBeanContext.getBean(PosTrade.class).moveToHistory();
+            SpringBeanContext.getBean(MenuDataService.class).buildMenuForAllVendor();
         } catch (Exception e) {
             e.printStackTrace();
         }
         Every1MinuteSchedulerState = false;
     }
+
 
 }

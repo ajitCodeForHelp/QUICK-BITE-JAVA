@@ -1,5 +1,6 @@
 package com.quickBite.primary.service;
 
+import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.primary.pojo.Setting;
 import com.quickBite.primary.pojo.UserAdmin;
 import com.quickBite.primary.pojo.enums.GenderEnum;
@@ -24,6 +25,11 @@ public class BaseDataService extends _BaseService {
     private void postConstruct() {
         generateDefaultAdmins();
         createDefaultSettings();
+        try {
+            SpringBeanContext.getBean(MenuDataService.class).buildMenuForAllVendor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Autowired

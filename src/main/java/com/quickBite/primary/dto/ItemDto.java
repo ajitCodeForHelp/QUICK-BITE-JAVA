@@ -29,8 +29,8 @@ public class ItemDto {
         private double maximumRetailPrice;
         private double salePrice;
 
-        private List<String> requiredAddOnList;
-        private List<String> optionalAddOnList;
+        private List<String> requiredAddOnIdList;
+        private List<String> optionalAddOnIdList;
 
     }
 
@@ -50,8 +50,8 @@ public class ItemDto {
         private double maximumRetailPrice;
         private double salePrice;
 
-        private List<String> requiredAddOnList;
-        private List<String> optionalAddOnList;
+        private List<String> requiredAddOnIdList;
+        private List<String> optionalAddOnIdList;
 
     }
 
@@ -77,8 +77,8 @@ public class ItemDto {
         private double maximumRetailPrice;
         private double salePrice;
 
-        private List<String> requiredAddOnList;
-        private List<String> optionalAddOnList;
+        private List<String> requiredAddOnIdList;
+        private List<String> optionalAddOnIdList;
     }
 
 }

@@ -34,7 +34,7 @@ public class VendorItemAddOnController extends _BaseController {
     }
 
     @GetMapping("/get/{id}")
-    protected ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
+    public ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Get AddOn Successfully.")
@@ -43,7 +43,7 @@ public class VendorItemAddOnController extends _BaseController {
     }
 
     @GetMapping("/list/{data}")
-    protected ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
+    public ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Get AddOn List Data Successfully.")
@@ -52,7 +52,7 @@ public class VendorItemAddOnController extends _BaseController {
     }
 
     @PutMapping("/activate/{id}")
-    protected ResponseEntity<ResponsePacket> activate(@PathVariable("id") String id) throws BadRequestException {
+    public ResponseEntity<ResponsePacket> activate(@PathVariable("id") String id) throws BadRequestException {
         itemAddOnService.activate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
@@ -61,7 +61,7 @@ public class VendorItemAddOnController extends _BaseController {
     }
 
     @PutMapping("/inactivate/{id}")
-    protected ResponseEntity<ResponsePacket> inactivate(@PathVariable("id") String id) throws BadRequestException {
+    public ResponseEntity<ResponsePacket> inactivate(@PathVariable("id") String id) throws BadRequestException {
         itemAddOnService.inactivate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
@@ -70,11 +70,20 @@ public class VendorItemAddOnController extends _BaseController {
     }
 
     @GetMapping("/key-value-list")
-    protected ResponseEntity<ResponsePacket> keyValueList() throws BadRequestException {
+    public ResponseEntity<ResponsePacket> keyValueList() throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Get Key List Data Successfully.")
                 .responsePacket(itemAddOnService.itemAddOnKeyValueList())
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/category-wise-key-value-list")
+    public ResponseEntity<ResponsePacket> categoryWiseKeyValueList(@Valid @RequestBody ItemAddOnDto.CategoryWiseItemAddOn request) throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("Get Key List Data Successfully.")
+                .responsePacket(itemAddOnService.categoryWiseKeyValueList(request.getSelectedCategoryList()))
                 .build(), HttpStatus.OK);
     }
 

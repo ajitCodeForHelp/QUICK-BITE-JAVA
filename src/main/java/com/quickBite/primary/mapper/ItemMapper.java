@@ -15,22 +15,22 @@ public interface ItemMapper {
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getRestaurantId()))", target = "restaurantId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getParentCategoryId()))", target = "parentCategoryId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getSubCategoryId()))", target = "subCategoryId")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(create.getRequiredAddOnList()))", target = "requiredAddOnList")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(create.getOptionalAddOnList()))", target = "optionalAddOnList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(create.getRequiredAddOnIdList()))", target = "requiredAddOnIdList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(create.getOptionalAddOnIdList()))", target = "optionalAddOnIdList")
     Item mapToPojo(ItemDto.CreateItem create);
 
     @Mapping(expression = "java(com.quickBite.utils.DateUtils.getTimeStamp(item.getCreatedAt()))", target = "createdAtTimeStamp")
     @Mapping(expression = "java(com.quickBite.utils.DateUtils.getTimeStamp(item.getModifiedAt()))", target = "modifiedAtTimeStamp")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringId(item.getParentCategoryId()))", target = "parentCategoryId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringId(item.getSubCategoryId()))", target = "subCategoryId")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringIds(item.getRequiredAddOnList()))", target = "requiredAddOnList")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringIds(item.getOptionalAddOnList()))", target = "optionalAddOnList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringIds(item.getRequiredAddOnIdList()))", target = "requiredAddOnIdList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toStringIds(item.getOptionalAddOnIdList()))", target = "optionalAddOnIdList")
     ItemDto.DetailItem mapToDetailDto(Item item);
 
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(update.getParentCategoryId()))", target = "parentCategoryId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(update.getSubCategoryId()))", target = "subCategoryId")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(update.getRequiredAddOnList()))", target = "requiredAddOnList")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(update.getOptionalAddOnList()))", target = "optionalAddOnList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(update.getRequiredAddOnIdList()))", target = "requiredAddOnIdList")
+    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(update.getOptionalAddOnIdList()))", target = "optionalAddOnIdList")
     Item mapToPojo(@MappingTarget Item item, ItemDto.UpdateItem update);
 
     @Mapping(expression = "java(item.getId())", target = "key")

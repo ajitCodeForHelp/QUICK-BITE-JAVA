@@ -107,6 +107,14 @@ public class RestaurantService extends _BaseService {
         return mongoTemplate.findOne(query, Restaurant.class);
     }
 
+    public List<Restaurant> findRestaurantListByVendorId(MongoTemplate mongoTemplate, ObjectId vendorId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("vendorId").is(vendorId))
+                .addCriteria(Criteria.where("active").is(true))
+                ;
+        return mongoTemplate.find(query, Restaurant.class);
+    }
+
     private List<Restaurant> findByActive(MongoTemplate mongoTemplate, boolean active) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(active));

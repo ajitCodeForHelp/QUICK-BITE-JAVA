@@ -113,4 +113,14 @@ public class ItemService extends _BaseService {
         return item;
     }
 
+    public List<Item> findByRestaurantId(MongoTemplate mongoTemplate, ObjectId vendorId, ObjectId restaurantId) {
+        // Only Give Those Item Which Are Active | RestaurantId | VendorId
+        Query query = new Query()
+                // .addCriteria(Criteria.where("vendorId").is(vendorId))
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
+                .addCriteria(Criteria.where("active").is(true))
+                ;
+        return mongoTemplate.find(query, Item.class);
+    }
+
 }

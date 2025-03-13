@@ -7,6 +7,7 @@ import com.quickBite.primary.mapper.ItemAddOnMapper;
 import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.primary.pojo.menu.ItemAddOn;
 import com.quickBite.security.JwtUserDetailsService;
+import com.quickBite.utils.TextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -93,6 +94,23 @@ public class ItemAddOnService extends _BaseService {
                 .collect(Collectors.toList());
     }
 
+    public List<KeyValueDto> categoryWiseKeyValueList(List<String> selectedCategoryIds) throws BadRequestException {
+        // Input > Categorys > Selected For A particular item
+        Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
+        MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
+        List<ItemAddOn> itemAddOnList = findByCategoryIds(mongoTemplate, TextUtils.toObjectIds(selectedCategoryIds));
+        return itemAddOnList.stream().map(itemAddOn ->
+                        ItemAddOnMapper.MAPPER.mapToKeyValueDto(itemAddOn))
+                .collect(Collectors.toList());
+    }
+
+    private List<ItemAddOn> findByCategoryIds(MongoTemplate mongoTemplate, List<ObjectId> categoryIds) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("active").is(true))
+                .addCriteria(Criteria.where("categoryId").in(categoryIds));
+        return mongoTemplate.find(query, ItemAddOn.class);
+    }
+
     private List<ItemAddOn> findByActive(MongoTemplate mongoTemplate, boolean active) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(active));
@@ -113,4 +131,10 @@ public class ItemAddOnService extends _BaseService {
         return itemAddOn;
     }
 
+    public List<ItemAddOn> findByIds(MongoTemplate mongoTemplate, ObjectId restaurantId, List<ObjectId> ids) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
+                .addCriteria(Criteria.where("id").in(ids));
+        return mongoTemplate.find(query, ItemAddOn.class);
+    }
 }

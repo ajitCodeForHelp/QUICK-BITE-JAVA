@@ -37,4 +37,39 @@ public class AuthController extends _BaseController {
                 .build(), HttpStatus.OK);
     }
 
+    @PostMapping("/customer-login")
+    public ResponseEntity<ResponsePacket> customerLogin(HttpServletRequest request, @Valid @RequestBody AuthDto.CustomerLogin login)
+            throws BadRequestException {
+        AuthDto.UserDetails userCustomerDetails = authService.loginCustomer(login.getUserName(), login.getPassword(), request.getRemoteAddr());
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("ecommerce.common.message.login")
+                .responsePacket(userCustomerDetails)
+                .build(), HttpStatus.OK);
+    }
+
+    @PostMapping("/customer-otp-login")
+    protected ResponseEntity<ResponsePacket> customerOtpLogin (HttpServletRequest request, @Valid @RequestBody AuthDto.CustomerOtpLogin login) throws BadRequestException {
+        AuthDto.UserDetails userCustomerDetails = authService.loginOtpCustomer(login, request.getRemoteAddr());
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("ecommerce.common.message.login")
+                .responsePacket(userCustomerDetails)
+                .build(), HttpStatus.OK);
+    }
+
+    // Only For Customer > Forgot-Password
+    /**
+     * Generate a Otp To Forgot Password then forgot password api
+     * if otp verify successfully then only new password will be updated successfully.
+     * */
+//    @PostMapping("/forgot-password")
+//    protected ResponseEntity<ResponsePacket> forgotPassword (HttpServletRequest request, @Valid @RequestBody AuthDto.ForgotPassword forgotPassword) throws BadRequestException {
+//        customerService.forgotPassword(forgotPassword);
+//        return new ResponseEntity<>(ResponsePacket.builder()
+//                .errorCode(0)
+//                .message("Password Reset Successfully")
+//                .build(), HttpStatus.OK);
+//    }
+
 }

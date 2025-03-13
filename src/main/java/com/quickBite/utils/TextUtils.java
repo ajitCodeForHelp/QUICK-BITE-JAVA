@@ -25,24 +25,25 @@ public class TextUtils {
 
     public static List<ObjectId> toObjectIds(List<String> ids) {
         if (isEmpty(ids)) return null;
-        List<ObjectId> objectIds = new ArrayList<>();
+        Set<ObjectId> objectIds = new HashSet<>();
         for (String id : ids) {
             objectIds.add(new ObjectId(id));
         }
-        return objectIds;
+        return objectIds.stream().toList();
     }
 
     public static List<String> toStringIds(List<ObjectId> ids) {
         if (ids == null) return null;
-        List<String> stringIds = new ArrayList<>();
+        Set<String> stringIds = new HashSet<>();
         for (ObjectId id : ids) {
             stringIds.add(id.toString());
         }
-        return stringIds;
+        return stringIds.stream().toList();
     }
-    public static String generate4DigitOTP() {
+
+    public static String generate6DigitOTP() {
         if (true) {
-            return "9999";
+            return "999999";
         }
         Random rnd = new Random();
         int number = rnd.nextInt(9999);

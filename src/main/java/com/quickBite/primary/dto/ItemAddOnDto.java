@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,6 +44,12 @@ public class ItemAddOnDto {
         private String title;
         private double addOnPrice = 0.0;
         private Long sortOrder;
+    }
+
+    @Getter
+    @Setter
+    public static class CategoryWiseItemAddOn {
+        private List<String> selectedCategoryList;
     }
 
 }

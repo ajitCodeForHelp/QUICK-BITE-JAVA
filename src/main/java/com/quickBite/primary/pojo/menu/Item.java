@@ -31,8 +31,8 @@ public class Item extends _BasicEntity {
     private double salePrice; // this will be final price
 
     // requiredAddOnList > free complementary addon which are served with item.
-    private List<ObjectId> requiredAddOnList;
+    private List<ObjectId> requiredAddOnIdList;
     // OptionalAddOnList > Optional addon which are served with item > But with extra cost included.
-    private List<ObjectId> optionalAddOnList;
+    private List<ObjectId> optionalAddOnIdList;
 
 }
