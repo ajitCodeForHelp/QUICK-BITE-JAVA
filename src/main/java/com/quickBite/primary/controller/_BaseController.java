@@ -15,4 +15,6 @@ public class _BaseController {
     @Autowired protected VendorService vendorService;
     @Autowired protected RestaurantService restaurantService;
 
+    @Autowired protected CategoryService categoryService;
+
 }

@@ -1,6 +1,7 @@
 package com.quickBite.utils;
 
 import com.nimbusds.jose.shaded.gson.Gson;
+import org.bson.types.ObjectId;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -12,6 +13,15 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class TextUtils {
+    public static ObjectId toObjectId(String id) {
+        if (isEmpty(id)) return null;
+        return new ObjectId(id);
+    }
+
+    public static String toStringId(ObjectId id) {
+        if (id == null) return null;
+        return id.toString();
+    }
     public static String generate4DigitOTP() {
         if (true) {
             return "9999";
