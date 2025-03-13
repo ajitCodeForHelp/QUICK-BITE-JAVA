@@ -5,6 +5,10 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.quickBite.exception.BadRequestException;
+import com.quickBite.exception.InvalidDatabaseAccessException;
+import com.quickBite.primary.pojo.Vendor;
+import com.quickBite.primary.service.VendorService;
+import com.quickBite.utils.TextUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -32,37 +36,33 @@ public class MultiMongoDBFactory {
     // TODO > Future > Redis
     // TODO > Future > dataBaseObjects.clear() || dataBaseObjects > Connection Pooling
 
-    public MongoTemplate getClientDbConnection(String clientUuid) throws BadRequestException {
+    public MongoTemplate getVendorDbConnection(String vendorId) throws BadRequestException {
         MongoTemplate mongoTemplate;
-        if (dataBaseObjects.containsKey(clientUuid)) {
-            mongoTemplate = dataBaseObjects.get(clientUuid);
+        if (dataBaseObjects.containsKey(vendorId)) {
+            mongoTemplate = dataBaseObjects.get(vendorId);
             return mongoTemplate;
         }
-        // TODO > In case of Brand Inactive or Delete > just remove connection from dataBaseObjects
         try {
-//            Brand brand = SpringBeanContext.getBean(BrandService.class).findByUuidWithActiveAndDeletedValidation(brandUuid);
-//            Database database = brand.getDatabaseDetails();
-//            if (database == null) {
-//                throw new InvalidDatabaseAccessException("Invalid DB credentials");
-//            }
-//            if (TextUtils.isEmpty(database.getDatabaseUri())) {
-//                throw new InvalidDatabaseAccessException("Invalid DB path provided.");
-//            }
-//            if (TextUtils.isEmpty(database.getDatabaseName())) {
-//                throw new InvalidDatabaseAccessException("Invalid DB name provided.");
-//            }
-//            mongoTemplate = getDatabase(database.getDatabaseUri(), database.getDatabaseName());
+            Vendor vendor = SpringBeanContext.getBean(VendorService.class).findById(vendorId);
+            Vendor.Database database = vendor.getDatabaseDetail();
+            if (!vendor.isActive()) {
+                dataBaseObjects.remove(vendorId);
+                throw new InvalidDatabaseAccessException("Vendor Is Temporary Blocked Please Contact To Admin.");
+            }
+            if (database == null) {
+                throw new InvalidDatabaseAccessException("Invalid DB credentials.");
+            }
+            if (TextUtils.isEmpty(database.getDatabaseUri())) {
+                throw new InvalidDatabaseAccessException("Invalid DB path provided.");
+            }
+            if (TextUtils.isEmpty(database.getDatabaseName())) {
+                throw new InvalidDatabaseAccessException("Invalid DB name provided.");
+            }
+            mongoTemplate = getDatabase(database.getDatabaseUri(), database.getDatabaseName());
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
-//        dataBaseObjects.put(brandUuid, mongoTemplate);
-//        return mongoTemplate;
-        return null;
+        dataBaseObjects.put(vendorId, mongoTemplate);
+        return mongoTemplate;
     }
-
-    public void removeClientBrandDbConnection(String brandUuid) {
-//        dataBaseObjects.remove(brandUuid);
-    }
-
-    // TODO > Check Connection counts are not increasing gradually
 }

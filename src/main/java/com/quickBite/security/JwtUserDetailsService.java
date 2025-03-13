@@ -5,6 +5,7 @@ import com.quickBite.primary.pojo._BaseUser;
 import com.quickBite.primary.pojo.enums.RoleEnum;
 import com.quickBite.primary.repository.UserAdminRepository;
 import com.quickBite.primary.service.UserAdminService;
+import com.quickBite.primary.service.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -59,7 +60,10 @@ public class JwtUserDetailsService implements UserDetailsService {
             if (userType.equals(RoleEnum.ROLE_ADMIN.toString())
                     || userType.equals(RoleEnum.ROLE_SUPER_ADMIN.toString())) {
                 user = SpringBeanContext.getBean(UserAdminService.class).findById(userId);
+            } else if (userType.equals(RoleEnum.ROLE_VENDOR.toString())) {
+                user = SpringBeanContext.getBean(VendorService.class).findById(userId);
             }
+            // TODO >> Add More User
         } catch (Exception e) {
             throw new UsernameNotFoundException(e.getMessage());
         }

@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -40,7 +41,7 @@ public class _BaseUser extends _BasicEntity implements UserDetails {
     protected String walletReferenceId;
     protected String photoImageUrl;
 
-    protected String uniqueKey;
+    protected String uniqueKey = UUID.randomUUID().toString();
 
     protected Boolean forceUpdatePassword = true;
 

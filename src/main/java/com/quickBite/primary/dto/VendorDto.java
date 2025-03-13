@@ -39,11 +39,11 @@ public class VendorDto {
     @Getter
     @Setter
     public static class UpdateVendor {
-        private String firstName;
-        private String lastName;
-        private String photoImageUrl;
+        @NotNull private String firstName;
+        @NotNull private String lastName;
+        @NotNull private String photoImageUrl;
 
-        private Vendor.ContactDetail contactDetail;
+        @NotNull private Vendor.ContactDetail contactDetail;
     }
 
     @Setter
@@ -54,11 +54,24 @@ public class VendorDto {
     @Setter
     @Getter
     public static class DetailVendor extends _BasicDto {
-        private String firstName;
-        private String lastName;
-        private String username;
-        private String photoImageUrl;
+        @NotNull private String firstName;
+        @NotNull private String lastName;
+        @NotNull private String username;
+        @NotNull private String photoImageUrl;
 
-        private Vendor.ContactDetail contactDetail;
+        @NotNull private Vendor.ContactDetail contactDetail;
+    }
+
+    @Getter
+    @Setter
+    public static class CreateVendorRequest {
+        @NotNull private String firstName;
+        @NotNull private String lastName;
+        @NotNull private String MobileNumber;
+    }
+    @Getter
+    @Setter
+    public static class ResetPassword {
+        @NotNull private String password;
     }
 }

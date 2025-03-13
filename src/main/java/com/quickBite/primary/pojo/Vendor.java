@@ -13,8 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "vendor")
 public class Vendor extends _BaseUser {
 
-    private Long seqId;
     private ObjectId adminId;
+    private Long seqId;
     private Database databaseDetail;
     private ContactDetail contactDetail;
 
