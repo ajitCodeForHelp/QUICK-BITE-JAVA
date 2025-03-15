@@ -3,9 +3,11 @@ package com.quickBite.primary.service;
 import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.dto.AuthDto;
+import com.quickBite.primary.pojo.Customer;
 import com.quickBite.primary.pojo.UserAdmin;
 import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.primary.pojo._BaseUser;
+import com.quickBite.primary.repository.CustomerRepository;
 import com.quickBite.security.JwtTokenUtil;
 import com.quickBite.utils.TextUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,12 @@ public class AuthService extends _BaseService {
     @Autowired
     protected JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    protected CustomerRepository customerRepository;
+
+    @Autowired
+    protected CustomerService customerService;
+
     public UserAdmin findByUsername(String userName) throws BadRequestException {
         UserAdmin pojo = userAdminRepository.findFirstByUsername(userName);
         if (pojo == null) {
@@ -30,13 +38,13 @@ public class AuthService extends _BaseService {
         return pojo;
     }
 
-//    public Customer findByCustomerUsername(String username) throws BadRequestException {
-//        Customer customer = customerRepository.findFirstByUsername(username);
-//        if (customer == null) {
-//            throw new BadRequestException("ecommerce.common.message.record_not_exist");
-//        }
-//        return customer;
-//    }
+    public Customer findByCustomerUsername(String username) throws BadRequestException {
+        Customer customer = customerRepository.findFirstByUsername(username);
+        if (customer == null) {
+            throw new BadRequestException("Customer Record Not Exist");
+        }
+        return customer;
+    }
 
     public AuthDto.UserDetails loginAdmin(String userName, String password, String ipAddress) throws BadRequestException {
         UserAdmin userAdmin = findByUsername(userName);
@@ -54,25 +62,25 @@ public class AuthService extends _BaseService {
         return generateAuthTokenAndGetUserDetails(vendor, ipAddress);
     }
 
-//    public AuthDto.UserDetails loginCustomer(String userName, String password, String ipAddress) throws BadRequestException {
-//        Customer userCustomer = findByCustomerUsername(userName);
-//        validateUser(userCustomer, password);
-//        userCustomer.setLastLogin(LocalDateTime.now());
-//        customerRepository.save(userCustomer);
-//        return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
-//    }
-//
-//    public AuthDto.UserDetails loginOtpCustomer(AuthDto.CustomerOtpLogin login, String ipAddress) throws BadRequestException {
-//        // Verify Otp And Save Customer If Not Exist And Validate.
-//        customerService.validateLoginWithOtp(login);
-//        Customer userCustomer = findByCustomerUsername(login.getMobile());
-//        if (!userCustomer.isActive() || userCustomer.isDeleted()) {
-//            throw new BadRequestException("ecommerce.common.message.user_disable");
-//        }
-//        userCustomer.setLastLogin(LocalDateTime.now());
-//        customerRepository.save(userCustomer);
-//        return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
-//    }
+    public AuthDto.UserDetails loginCustomer(String userName, String password, String ipAddress) throws BadRequestException {
+        Customer userCustomer = findByCustomerUsername(userName);
+        validateUser(userCustomer, password);
+        userCustomer.setLastLogin(LocalDateTime.now());
+        customerRepository.save(userCustomer);
+        return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
+    }
+
+    public AuthDto.UserDetails loginOtpCustomer(AuthDto.CustomerOtpLogin login, String ipAddress) throws BadRequestException {
+        // Verify Otp And Save Customer If Not Exist And Validate.
+        customerService.validateLoginWithOtp(login);
+        Customer userCustomer = findByCustomerUsername(login.getMobile());
+        if (!userCustomer.isActive()) {
+            throw new BadRequestException("Customer Id Blocked, Please Contact To Admin");
+        }
+        userCustomer.setLastLogin(LocalDateTime.now());
+        customerRepository.save(userCustomer);
+        return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
+    }
 
     private void validateUser(_BaseUser user, String password) throws BadRequestException {
 

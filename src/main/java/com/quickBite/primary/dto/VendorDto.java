@@ -60,6 +60,7 @@ public class VendorDto {
         @NotNull private String photoImageUrl;
 
         @NotNull private Vendor.ContactDetail contactDetail;
+        private Integer restaurantLimit;
     }
 
     @Getter

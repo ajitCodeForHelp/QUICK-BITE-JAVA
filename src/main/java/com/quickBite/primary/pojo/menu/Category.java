@@ -21,6 +21,5 @@ public class Category extends _BasicEntity {
     private String description;
     private Long sortOrder;
     private String categoryIconUrl;
-    private List<String> categoryImageUrls;
 
 }

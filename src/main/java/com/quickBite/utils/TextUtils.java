@@ -1,6 +1,7 @@
 package com.quickBite.utils;
 
 import com.nimbusds.jose.shaded.gson.Gson;
+import org.bson.types.ObjectId;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -12,9 +13,37 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class TextUtils {
-    public static String generate4DigitOTP() {
+    public static ObjectId toObjectId(String id) {
+        if (isEmpty(id)) return null;
+        return new ObjectId(id);
+    }
+
+    public static String toStringId(ObjectId id) {
+        if (id == null) return null;
+        return id.toString();
+    }
+
+    public static List<ObjectId> toObjectIds(List<String> ids) {
+        if (isEmpty(ids)) return null;
+        Set<ObjectId> objectIds = new HashSet<>();
+        for (String id : ids) {
+            objectIds.add(new ObjectId(id));
+        }
+        return objectIds.stream().toList();
+    }
+
+    public static List<String> toStringIds(List<ObjectId> ids) {
+        if (ids == null) return null;
+        Set<String> stringIds = new HashSet<>();
+        for (ObjectId id : ids) {
+            stringIds.add(id.toString());
+        }
+        return stringIds.stream().toList();
+    }
+
+    public static String generate6DigitOTP() {
         if (true) {
-            return "9999";
+            return "999999";
         }
         Random rnd = new Random();
         int number = rnd.nextInt(9999);

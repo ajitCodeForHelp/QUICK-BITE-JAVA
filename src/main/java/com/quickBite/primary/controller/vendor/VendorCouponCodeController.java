@@ -1,9 +1,9 @@
-package com.quickBite.primary.controller.admin;
+package com.quickBite.primary.controller.vendor;
 
 import com.quickBite.bean.ResponsePacket;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.controller._BaseController;
-import com.quickBite.primary.dto.VendorDto;
+import com.quickBite.primary.dto.CouponCodeDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -12,24 +12,24 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin/v1/vendor")
-public class AdminVendorController extends _BaseController {
+@RequestMapping("/vendor/v1/coupon-code")
+public class VendorCouponCodeController extends _BaseController {
 
     @PostMapping("/save")
-    public ResponseEntity<ResponsePacket> save(@Valid @RequestBody VendorDto.CreateVendor vendor) throws BadRequestException {
+    public ResponseEntity<ResponsePacket> save(@Valid @RequestBody CouponCodeDto.CreateCouponCode request) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Vendor Saved.")
-                .responsePacket(vendorService.save(vendor))
+                .message("Coupon Code Saved Successfully.")
+                .responsePacket(couponCodeService.save(request))
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResponsePacket> update(@PathVariable("id") String id, @Valid @RequestBody VendorDto.UpdateVendor vendor) throws BadRequestException {
-        vendorService.update(id, vendor);
+    public ResponseEntity<ResponsePacket> update(@PathVariable("id") String id, @Valid @RequestBody CouponCodeDto.UpdateCouponCode request) throws BadRequestException {
+        couponCodeService.update(id, request);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Vendor Updated.")
+                .message("Coupon Code Updated Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -37,8 +37,8 @@ public class AdminVendorController extends _BaseController {
     protected ResponseEntity<ResponsePacket> get(@PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Get Details")
-                .responsePacket(vendorService.get(id))
+                .message("Get Coupon Code Data Successfully.")
+                .responsePacket(couponCodeService.get(id))
                 .build(), HttpStatus.OK);
     }
 
@@ -46,36 +46,26 @@ public class AdminVendorController extends _BaseController {
     protected ResponseEntity<ResponsePacket> list(@PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Data List.")
-                .responsePacket(vendorService.list(data))
+                .message("Get List Data Successfully.")
+                .responsePacket(couponCodeService.list(data))
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/activate/{id}")
     protected ResponseEntity<ResponsePacket> activate(@PathVariable("id") String id) throws BadRequestException {
-        vendorService.activate(id);
+        couponCodeService.activate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Vendor Activate.")
+                .message("Coupon Code Activate Successfully.")
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/inactivate/{id}")
     protected ResponseEntity<ResponsePacket> inactivate(@PathVariable("id") String id) throws BadRequestException {
-        vendorService.inactivate(id);
+        couponCodeService.inactivate(id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Vendor InActivate.")
-                .build(), HttpStatus.OK);
-    }
-
-    @PutMapping("/reset-password/{id}")
-    public ResponseEntity<ResponsePacket> resetPassword(@PathVariable("id") String id,
-                                                        @Valid @RequestBody VendorDto.ResetPassword request) throws BadRequestException {
-        vendorService.resetPassword(id, request);
-        return new ResponseEntity<>(ResponsePacket.builder()
-                .errorCode(0)
-                .message("Password Reset Successfully.")
+                .message("Coupon Code InActivate Successfully.")
                 .build(), HttpStatus.OK);
     }
 
