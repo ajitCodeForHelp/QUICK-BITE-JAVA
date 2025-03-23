@@ -6,12 +6,10 @@ import com.quickBite.primary.dto.CustomerDto;
 import com.quickBite.primary.dto.VendorDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -33,6 +31,15 @@ public class GuestController extends _BaseController {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Otp Generated Successfully.")
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{restaurantId}/get-customer-menu")
+    protected ResponseEntity<ResponsePacket> getMenu(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .responsePacket(menuDataService.getMenu(restaurantId))
+                .errorCode(0)
+                .message("Get Menu Successfully.")
                 .build(), HttpStatus.OK);
     }
 
