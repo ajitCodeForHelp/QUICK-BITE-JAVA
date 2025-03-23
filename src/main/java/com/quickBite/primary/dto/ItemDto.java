@@ -15,7 +15,6 @@ public class ItemDto {
     @Getter
     @Setter
     public static class CreateItem {
-        private String restaurantId;
         private String parentCategoryId;
         private String subCategoryId;
 

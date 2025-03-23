@@ -13,7 +13,6 @@ public interface ItemAddOnMapper {
     ItemAddOnMapper MAPPER = Mappers.getMapper(ItemAddOnMapper.class);
 
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getCategoryId()))", target = "categoryId")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getRestaurantId()))", target = "restaurantId")
     ItemAddOn mapToPojo(ItemAddOnDto.CreateItemAddOn create);
 
     @Mapping(expression = "java(com.quickBite.utils.DateUtils.getTimeStamp(itemAddOn.getCreatedAt()))", target = "createdAtTimeStamp")

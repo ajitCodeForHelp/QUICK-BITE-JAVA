@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public class CouponCode extends _BasicEntity {
 
     private ObjectId vendorId;
+    private ObjectId restaurantId;
     private String title;
     private String couponCode; // Must Be Unique
 

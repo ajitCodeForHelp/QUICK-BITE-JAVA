@@ -12,7 +12,6 @@ public class CategoryDto {
     @Getter
     @Setter
     public static class CreateCategory {
-        private String restaurantId;
         private String parentCategoryId;
         private String title;
         private String description;

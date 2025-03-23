@@ -26,6 +26,7 @@ public class _BaseController {
     @Autowired protected OneTimePasswordService oneTimePasswordService;
     @Autowired protected MenuDataService menuDataService;
     @Autowired protected AppCodeService appCodeService;
+    @Autowired protected TaxService taxService;
 
     protected MongoTemplate getMongoTemplate(String vendorId) throws BadRequestException {
         return SpringBeanContext.getBean(MultiMongoDBFactory.class).getVendorDbConnection(vendorId);

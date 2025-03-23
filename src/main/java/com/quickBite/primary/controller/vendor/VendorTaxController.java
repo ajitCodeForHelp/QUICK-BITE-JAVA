@@ -3,7 +3,7 @@ package com.quickBite.primary.controller.vendor;
 import com.quickBite.bean.ResponsePacket;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.controller._BaseController;
-import com.quickBite.primary.dto.CategoryDto;
+import com.quickBite.primary.dto.TaxDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -13,27 +13,26 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/vendor/v1/{restaurantId}/category")
-public class VendorCategoryController extends _BaseController {
+@RequestMapping("/vendor/v1/{restaurantId}/tax")
+public class VendorTaxController extends _BaseController {
 
     @PostMapping("/save")
     public ResponseEntity<ResponsePacket> save(@PathVariable("restaurantId") ObjectId restaurantId,
-                                               @Valid @RequestBody CategoryDto.CreateCategory request) throws BadRequestException {
+                                               @Valid @RequestBody TaxDto.CreateTax request) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Category Saved Successfully.")
-                .responsePacket(categoryService.save(restaurantId, request))
+                .message("Tax Saved Successfully.")
+                .responsePacket(taxService.save(restaurantId, request))
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<ResponsePacket> update(@PathVariable("restaurantId") ObjectId restaurantId,
-                                                 @PathVariable("id") String id,
-                                                 @Valid @RequestBody CategoryDto.UpdateCategory request) throws BadRequestException {
-        categoryService.update(restaurantId, id, request);
+                                                 @PathVariable("id") String id, @Valid @RequestBody TaxDto.UpdateTax request) throws BadRequestException {
+        taxService.update(restaurantId, id, request);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Category Updated Successfully.")
+                .message("Tax Updated Successfully.")
                 .build(), HttpStatus.OK);
     }
 
@@ -42,8 +41,8 @@ public class VendorCategoryController extends _BaseController {
                                                  @PathVariable("id") String id) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Get Category Data Successfully.")
-                .responsePacket(categoryService.get(restaurantId, id))
+                .message("Get Tax Data Successfully.")
+                .responsePacket(taxService.get(restaurantId, id))
                 .build(), HttpStatus.OK);
     }
 
@@ -52,55 +51,37 @@ public class VendorCategoryController extends _BaseController {
                                                   @PathVariable("data") String data) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Get Category List Data Successfully.")
-                .responsePacket(categoryService.list(restaurantId, data))
+                .message("Get Tax List Data Successfully.")
+                .responsePacket(taxService.list(restaurantId, data))
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/activate/{id}")
     protected ResponseEntity<ResponsePacket> activate(@PathVariable("restaurantId") ObjectId restaurantId,
                                                       @PathVariable("id") String id) throws BadRequestException {
-        categoryService.activate(restaurantId, id);
+        taxService.activate(restaurantId, id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Category Activate Successfully.")
+                .message("Tax Activate Successfully.")
                 .build(), HttpStatus.OK);
     }
 
     @PutMapping("/inactivate/{id}")
     protected ResponseEntity<ResponsePacket> inactivate(@PathVariable("restaurantId") ObjectId restaurantId,
                                                         @PathVariable("id") String id) throws BadRequestException {
-        categoryService.inactivate(restaurantId, id);
+        taxService.inactivate(restaurantId, id);
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
-                .message("Category InActive Successfully.")
+                .message("Tax InActive Successfully.")
                 .build(), HttpStatus.OK);
     }
 
-    @GetMapping("/category-key-value-list")
-    protected ResponseEntity<ResponsePacket> categoryKeyValueList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
+    @GetMapping("/tax-key-value-list")
+    protected ResponseEntity<ResponsePacket> taxKeyValueList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Get List Data Successfully.")
-                .responsePacket(categoryService.categoryKeyValueList(restaurantId))
-                .build(), HttpStatus.OK);
-    }
-
-    @GetMapping("/parent-key-value-list")
-    protected ResponseEntity<ResponsePacket> parentKeyValueList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
-        return new ResponseEntity<>(ResponsePacket.builder()
-                .errorCode(0)
-                .message("Get List Data Successfully.")
-                .responsePacket(categoryService.parentCategoryKeyValueList(restaurantId))
-                .build(), HttpStatus.OK);
-    }
-
-    @GetMapping("/sub-category-key-value-list")
-    protected ResponseEntity<ResponsePacket> subCategoryKeyValueList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
-        return new ResponseEntity<>(ResponsePacket.builder()
-                .errorCode(0)
-                .message("Get List Data Successfully.")
-                .responsePacket(categoryService.subCategoryKeyValueList(restaurantId))
+                .responsePacket(taxService.taxKeyValueList(restaurantId))
                 .build(), HttpStatus.OK);
     }
 

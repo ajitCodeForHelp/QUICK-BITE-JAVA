@@ -2,10 +2,10 @@ package com.quickBite.primary.service;
 
 import com.quickBite.bean.KeyValueDto;
 import com.quickBite.exception.BadRequestException;
-import com.quickBite.primary.dto.ItemDto;
-import com.quickBite.primary.mapper.ItemMapper;
+import com.quickBite.primary.dto.TaxDto;
+import com.quickBite.primary.mapper.TaxMapper;
+import com.quickBite.primary.pojo.Tax;
 import com.quickBite.primary.pojo.Vendor;
-import com.quickBite.primary.pojo.menu.Item;
 import com.quickBite.security.JwtUserDetailsService;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -22,39 +22,39 @@ import static com.quickBite.configuration.SpringBeanContext.getBean;
 
 @Slf4j
 @Service
-public class ItemService extends _BaseService {
+public class TaxService extends _BaseService {
 
-    public String save(ObjectId restaurantId, ItemDto.CreateItem request) throws BadRequestException {
+    public String save(ObjectId restaurantId, TaxDto.CreateTax request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Item item = new Item();
-        item.setVendorId(loggedInUser.getObjectId());
-        item.setRestaurantId(restaurantId);
-        item = ItemMapper.MAPPER.mapToPojo(request);
-        mongoTemplate.save(item);
-        return item.getId();
+        Tax tax = new Tax();
+        tax.setVendorId(loggedInUser.getObjectId());
+        tax.setRestaurantId(restaurantId);
+        tax = TaxMapper.MAPPER.mapToPojo(request);
+        mongoTemplate.save(tax);
+        return tax.getId();
     }
 
-    public void update(ObjectId restaurantId, String id, ItemDto.UpdateItem request) throws BadRequestException {
+    public void update(ObjectId restaurantId, String id, TaxDto.UpdateTax request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Item item = findById(mongoTemplate, id);
-        item = ItemMapper.MAPPER.mapToPojo(item, request);
-        mongoTemplate.save(item);
+        Tax tax = findById(mongoTemplate, id);
+        tax = TaxMapper.MAPPER.mapToPojo(tax, request);
+        mongoTemplate.save(tax);
     }
 
-    public ItemDto.DetailItem get(ObjectId restaurantId, String id) throws BadRequestException {
+    public TaxDto.DetailTax get(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Item item = findById(mongoTemplate, id);
-        return ItemMapper.MAPPER.mapToDetailDto(item);
+        Tax tax = findById(mongoTemplate, id);
+        return TaxMapper.MAPPER.mapToDetailDto(tax);
     }
 
-    public List<ItemDto.DetailItem> list(ObjectId restaurantId, String data) throws BadRequestException {
+    public List<TaxDto.DetailTax> list(ObjectId restaurantId, String data) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         // Data >  Active | Inactive  | All
-        List<Item> list = null;
+        List<Tax> list = null;
         if (data.equals("Active")) {
             list = findByActive(mongoTemplate, restaurantId, true);
         } else if (data.equals("Inactive")) {
@@ -63,67 +63,64 @@ public class ItemService extends _BaseService {
             list = findAll(mongoTemplate, restaurantId);
         }
         return list.stream()
-                .map(item -> ItemMapper.MAPPER.mapToDetailDto(item))
+                .map(tax -> TaxMapper.MAPPER.mapToDetailDto(tax))
                 .collect(Collectors.toList());
     }
 
     public void activate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Item item = findById(mongoTemplate, id);
-        item.setActive(true);
-        item.setModifiedAt(LocalDateTime.now());
-        mongoTemplate.save(item);
+        Tax tax = findById(mongoTemplate, id);
+        tax.setActive(true);
+        tax.setModifiedAt(LocalDateTime.now());
+        mongoTemplate.save(tax);
     }
 
     public void inactivate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Item item = findById(mongoTemplate, id);
-        item.setActive(false);
-        item.setModifiedAt(LocalDateTime.now());
-        mongoTemplate.save(item);
+        Tax tax = findById(mongoTemplate, id);
+        tax.setActive(false);
+        tax.setModifiedAt(LocalDateTime.now());
+        mongoTemplate.save(tax);
     }
 
-    public List<KeyValueDto> itemKeyValueList(ObjectId restaurantId) throws BadRequestException {
+    public List<KeyValueDto> taxKeyValueList(ObjectId restaurantId) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<Item> itemList = findByActive(mongoTemplate, restaurantId, true);
-        return itemList.stream().map(item ->
-                        ItemMapper.MAPPER.mapToKeyValueDto(item))
+        List<Tax> taxList = findByRestaurantIdActiveTax(mongoTemplate, restaurantId);
+        return taxList.stream().map(tax ->
+                        TaxMapper.MAPPER.mapToKeyValueDto(tax))
                 .collect(Collectors.toList());
     }
 
-    private List<Item> findByActive(MongoTemplate mongoTemplate, ObjectId restaurantId, boolean active) {
+    private List<Tax> findByRestaurantIdActiveTax(MongoTemplate mongoTemplate, ObjectId restaurantId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("active").is(true))
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId));
+        return mongoTemplate.find(query, Tax.class);
+    }
+
+    private List<Tax> findByActive(MongoTemplate mongoTemplate, ObjectId restaurantId, boolean active) {
         Query query = new Query()
                 .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("active").is(active));
-        return mongoTemplate.find(query, Item.class);
+        return mongoTemplate.find(query, Tax.class);
     }
 
-    private List<Item> findAll(MongoTemplate mongoTemplate, ObjectId restaurantId) {
+    private List<Tax> findAll(MongoTemplate mongoTemplate, ObjectId restaurantId) {
         Query query = new Query()
                 .addCriteria(Criteria.where("restaurantId").is(restaurantId));
-        return mongoTemplate.find(query, Item.class);
+        return mongoTemplate.find(query, Tax.class);
     }
 
-    private Item findById(MongoTemplate mongoTemplate, String id) throws BadRequestException {
+    private Tax findById(MongoTemplate mongoTemplate, String id) throws BadRequestException {
         Query query = new Query()
                 .addCriteria(Criteria.where("id").is(new ObjectId(id)));
-        Item item = mongoTemplate.findOne(query, Item.class);
-        if (item == null) {
-            throw new BadRequestException("Item Record Not Exist.");
+        Tax tax = mongoTemplate.findOne(query, Tax.class);
+        if (tax == null) {
+            throw new BadRequestException("Tax Record Not Exist.");
         }
-        return item;
+        return tax;
     }
-
-    public List<Item> findByRestaurantId(MongoTemplate mongoTemplate, ObjectId vendorId, ObjectId restaurantId) {
-        // Only Give Those Item Which Are Active | RestaurantId | VendorId
-        Query query = new Query()
-                .addCriteria(Criteria.where("vendorId").is(vendorId))
-                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
-                .addCriteria(Criteria.where("active").is(true));
-        return mongoTemplate.find(query, Item.class);
-    }
-
 }

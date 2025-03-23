@@ -12,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 public interface ItemMapper {
     ItemMapper MAPPER = Mappers.getMapper(ItemMapper.class);
 
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getRestaurantId()))", target = "restaurantId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getParentCategoryId()))", target = "parentCategoryId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getSubCategoryId()))", target = "subCategoryId")
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectIds(create.getRequiredAddOnIdList()))", target = "requiredAddOnIdList")

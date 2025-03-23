@@ -14,7 +14,6 @@ public class ItemAddOnDto {
     @Getter
     @Setter
     public static class CreateItemAddOn {
-        private String restaurantId;
         private String categoryId;
         private String title;
         private double addOnPrice = 0.0;
