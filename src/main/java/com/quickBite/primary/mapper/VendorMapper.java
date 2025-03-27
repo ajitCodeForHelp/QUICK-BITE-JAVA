@@ -1,6 +1,8 @@
 package com.quickBite.primary.mapper;
 
+import com.quickBite.bean.KeyValueDto;
 import com.quickBite.primary.dto.VendorDto;
+import com.quickBite.primary.pojo.Tax;
 import com.quickBite.primary.pojo.Vendor;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,6 +20,9 @@ public interface VendorMapper {
     VendorDto.DetailVendor mapToDetailDto(Vendor create);
 
     Vendor mapToPojo(@MappingTarget Vendor vendor, VendorDto.UpdateVendor update);
-
+    @Mapping(expression = "java(vendor.getId())", target = "key")
+    @Mapping(expression = "java(vendor.fullName())", target = "value")
+    @Mapping(expression = "java(vendor.fullName())", target = "label")
+    KeyValueDto mapToKeyValueDto(Vendor vendor);
 
 }

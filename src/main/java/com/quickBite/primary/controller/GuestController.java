@@ -43,5 +43,21 @@ public class GuestController extends _BaseController {
                 .build(), HttpStatus.OK);
     }
 
+    @GetMapping("/{restaurantId}/get-coupon-code-list")
+    protected ResponseEntity<ResponsePacket> getCouponCodeList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .responsePacket(couponCodeService.getCustomerCouponCodeList(restaurantId))
+                .errorCode(0)
+                .message("Get Customer Coupon Code List Successfully.")
+                .build(), HttpStatus.OK);
+    }
 
+    @GetMapping("/{restaurantId}/get-banner-list")
+    protected ResponseEntity<ResponsePacket> getBannerList(@PathVariable("restaurantId") ObjectId restaurantId) throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .responsePacket(bannerService.getBannerList(restaurantId))
+                .errorCode(0)
+                .message("Get Customer Banner List Successfully.")
+                .build(), HttpStatus.OK);
+    }
 }

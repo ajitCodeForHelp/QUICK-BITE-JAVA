@@ -36,12 +36,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
         final String requestTokenHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        String userId = null;
-        String brandUuid = null;
-        String userType = null;
-        String deviceId = null;
-        String userToken = null;
         String username = null;
+        String userId = null;
+        String userType = null;
+        String userToken = null;
+        String vendorId = null;
+
 
         String jwtToken = null;
         if (requestTokenHeader != null) {
@@ -53,10 +53,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                 userId = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "u-id");
-                brandUuid = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "b-id");
                 userType = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "u-ty");
-                deviceId = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "d-id");
                 userToken = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "token");
+                vendorId = (String) jwtTokenUtil.getValueFromClaimsKey(jwtToken, "vendorId");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -68,17 +67,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(userId, userType, userToken, brandUuid);
+            UserDetails userDetails = this.jwtUserDetailsService.loadUserByUsername(userId, userType, userToken, vendorId);
             // UserAdmin userAdmin = this.jwtUserDetailsService.findUserAdmin(username);
             if (Boolean.TRUE.equals(jwtTokenUtil.validateToken(jwtToken, userDetails))) {
                 JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(
                         Jwt.withTokenValue(jwtToken)
                                 .claim("username", username)
                                 .claim("u-id", userId)
-                                .claim("b-id", brandUuid)
                                 .claim("u-ty", userType)
-                                .claim("d-id", deviceId)
                                 .claim("token", userToken)
+                                .claim("vendorId", vendorId)
                                 .header(HttpHeaders.AUTHORIZATION, requestTokenHeader)
                                 .build()
                 );

@@ -149,7 +149,7 @@ public class MenuDataService extends _BaseService {
     public List<Menu.MenuItems> getMenu(ObjectId restaurantId) throws BadRequestException {
         AppCode appCode = appCodeRepository.findFirstByRestaurantId(restaurantId);
         MongoTemplate mongoTemplate = getMongoTemplate(appCode.getVendorId().toString());
-        Menu menu = findByRestaurantId(mongoTemplate, appCode.getRestaurantId());
+        Menu menu = findByRestaurantId(mongoTemplate, restaurantId);
         if (menu == null) {
             menu = generateMenu(mongoTemplate, appCode.getVendorId(), appCode.getRestaurantId());
         }

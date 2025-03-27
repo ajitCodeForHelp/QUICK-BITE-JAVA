@@ -18,6 +18,4 @@ public interface BannerMapper {
     BannerDto.DetailBanner mapToDetailDto(Banner create);
 
     Banner mapToPojo(@MappingTarget Banner banner, BannerDto.UpdateBanner update);
-
-
 }

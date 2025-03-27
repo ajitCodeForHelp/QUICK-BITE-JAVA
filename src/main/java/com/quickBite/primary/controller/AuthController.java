@@ -6,6 +6,7 @@ import com.quickBite.primary.dto.AuthDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,12 @@ public class AuthController extends _BaseController {
                 .build(), HttpStatus.OK);
     }
 
-    @PostMapping("/customer-login")
-    public ResponseEntity<ResponsePacket> customerLogin(HttpServletRequest request, @Valid @RequestBody AuthDto.CustomerLogin login)
+    @PostMapping("/{vendorId}/customer-login")
+    public ResponseEntity<ResponsePacket> customerLogin(HttpServletRequest request,
+                                                        @PathVariable("vendorId") ObjectId vendorId,
+                                                        @Valid @RequestBody AuthDto.CustomerLogin login)
             throws BadRequestException {
-        AuthDto.UserDetails userCustomerDetails = authService.loginCustomer(login.getUserName(), login.getPassword(), request.getRemoteAddr());
+        AuthDto.UserDetails userCustomerDetails = authService.loginCustomer(vendorId, login.getUserName(), login.getPassword(), request.getRemoteAddr());
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("ecommerce.common.message.login")
@@ -48,9 +51,11 @@ public class AuthController extends _BaseController {
                 .build(), HttpStatus.OK);
     }
 
-    @PostMapping("/customer-otp-login")
-    protected ResponseEntity<ResponsePacket> customerOtpLogin (HttpServletRequest request, @Valid @RequestBody AuthDto.CustomerOtpLogin login) throws BadRequestException {
-        AuthDto.UserDetails userCustomerDetails = authService.loginOtpCustomer(login, request.getRemoteAddr());
+    @PostMapping("/{vendorId}/customer-otp-login")
+    protected ResponseEntity<ResponsePacket> customerOtpLogin (HttpServletRequest request,
+                                                               @PathVariable("vendorId") ObjectId vendorId,
+                                                               @Valid @RequestBody AuthDto.CustomerOtpLogin login) throws BadRequestException {
+        AuthDto.UserDetails userCustomerDetails = authService.loginOtpCustomer(vendorId, login, request.getRemoteAddr());
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("ecommerce.common.message.login")

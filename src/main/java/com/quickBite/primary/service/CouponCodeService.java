@@ -3,6 +3,7 @@ package com.quickBite.primary.service;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.dto.CouponCodeDto;
 import com.quickBite.primary.mapper.CouponCodeMapper;
+import com.quickBite.primary.pojo.AppCode;
 import com.quickBite.primary.pojo.CouponCode;
 import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.security.JwtUserDetailsService;
@@ -101,10 +102,20 @@ public class CouponCodeService extends _BaseService {
     private CouponCode findById(MongoTemplate mongoTemplate, String id) throws BadRequestException {
         Query query = new Query()
                 .addCriteria(Criteria.where("id").is(new ObjectId(id)));
-        CouponCode category = mongoTemplate.findOne(query, CouponCode.class);
-        if (category == null) {
+        CouponCode couponCode = mongoTemplate.findOne(query, CouponCode.class);
+        if (couponCode == null) {
             throw new BadRequestException("CouponCode Record Not Exist.");
         }
-        return category;
+        return couponCode;
+    }
+
+    public List<CouponCodeDto.DetailCouponCode> getCustomerCouponCodeList(ObjectId restaurantId) throws BadRequestException {
+        AppCode appCode = appCodeRepository.findFirstByRestaurantId(restaurantId);
+        MongoTemplate mongoTemplate = getMongoTemplate(appCode.getVendorId().toString());
+        List<CouponCode> couponCodeList = findByActive(mongoTemplate, restaurantId, true);
+        if(TextUtils.isEmpty(couponCodeList)) return null;
+        return couponCodeList.stream()
+                .map(couponCode -> CouponCodeMapper.MAPPER.mapToDetailDto(couponCode))
+                .toList();
     }
 }
