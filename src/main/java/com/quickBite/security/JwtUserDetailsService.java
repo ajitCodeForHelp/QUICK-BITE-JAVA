@@ -1,12 +1,16 @@
 package com.quickBite.security;
 
+import com.quickBite.configuration.MongoConfig;
+import com.quickBite.configuration.MultiMongoDBFactory;
 import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.primary.pojo._BaseUser;
 import com.quickBite.primary.pojo.enums.RoleEnum;
 import com.quickBite.primary.repository.UserAdminRepository;
+import com.quickBite.primary.service.CustomerService;
 import com.quickBite.primary.service.UserAdminService;
 import com.quickBite.primary.service.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,10 +34,10 @@ public class JwtUserDetailsService implements UserDetailsService {
         return null;
     }
 
-    public UserDetails loadUserByUsername(String userId, String userType, String uniqueKey, String brandUuid) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userId, String userType, String uniqueKey, String vendorId) throws UsernameNotFoundException {
         // we use the user record id as user-name across the board
         User user = null;
-        _BaseUser appUser = getAppUser(userId, userType, uniqueKey);
+        _BaseUser appUser = getAppUser(userId, userType, uniqueKey, vendorId);
         if (appUser != null) {
             user = new User(appUser.getUsername(), "", new ArrayList<>());
         }
@@ -46,7 +50,8 @@ public class JwtUserDetailsService implements UserDetailsService {
         String userId = jwtAuthenticationToken.getTokenAttributes().get("u-id").toString();
         String userType = jwtAuthenticationToken.getTokenAttributes().get("u-ty").toString();
         String userToken = jwtAuthenticationToken.getTokenAttributes().get("token").toString();
-        return getAppUser(userId, userType, userToken);
+        String vendorId = jwtAuthenticationToken.getTokenAttributes().get("vendorId").toString();
+        return getAppUser(userId, userType, userToken, vendorId);
     }
 
 //    public UserClient getVendorLoggedInUser() throws UsernameNotFoundException {
@@ -54,7 +59,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 //        return (UserClient) loggedInUser;
 //    }
 
-    private _BaseUser getAppUser(String userId, String userType, String uniqueKey) throws UsernameNotFoundException {
+    private _BaseUser getAppUser(String userId, String userType, String uniqueKey, String vendorId) throws UsernameNotFoundException {
         _BaseUser user = null;
         try {
             if (userType.equals(RoleEnum.ROLE_ADMIN.toString())
@@ -62,6 +67,9 @@ public class JwtUserDetailsService implements UserDetailsService {
                 user = SpringBeanContext.getBean(UserAdminService.class).findById(userId);
             } else if (userType.equals(RoleEnum.ROLE_VENDOR.toString())) {
                 user = SpringBeanContext.getBean(VendorService.class).findById(userId);
+            } else if (userType.equals(RoleEnum.ROLE_CUSTOMER.toString())) {
+                MongoTemplate mongoTemplate = SpringBeanContext.getBean(MultiMongoDBFactory.class).getVendorDbConnection(vendorId);
+                user = SpringBeanContext.getBean(CustomerService.class).findById(mongoTemplate, userId);
             }
             // TODO >> Add More User
         } catch (Exception e) {

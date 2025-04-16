@@ -17,7 +17,6 @@ public class _BaseService {
     @Autowired protected SettingRepository settingRepository;
     @Autowired protected BannerRepository bannerRepository;
     @Autowired protected VendorRepository vendorRepository;
-    @Autowired protected CustomerRepository customerRepository;
     @Autowired protected OneTimePasswordRepository oneTimePasswordRepository;
     @Autowired protected AppCodeRepository appCodeRepository;
 

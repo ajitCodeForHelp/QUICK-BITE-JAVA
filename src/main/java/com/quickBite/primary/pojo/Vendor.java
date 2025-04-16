@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 
 @Setter
 @Getter
@@ -20,6 +22,7 @@ public class Vendor extends _BaseUser {
 
     // Restaurant Limit Vendor Can Make
     private Integer restaurantLimit = 1;
+    private List<ObjectId> restaurantIdList;
 
 
     @Setter

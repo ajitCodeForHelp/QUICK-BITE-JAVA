@@ -10,4 +10,5 @@ public interface VendorRepository extends MongoRepository<Vendor, ObjectId> {
 
     Vendor findByUsername(String username);
     List<Vendor> findByActive(boolean active);
+    List<Vendor> findByAdminId(ObjectId adminId);
 }

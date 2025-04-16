@@ -36,7 +36,7 @@ public class BannerDto {
     }
     @Setter
     @Getter
-    public static class DetailBanner extends _BasicDto{
+    public static class DetailBanner extends _BasicDto {
         private String title;
         private BannerTypeEnum bannerTypeEnum;
         private String bannerImageUrl;

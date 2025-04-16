@@ -13,7 +13,6 @@ public interface CategoryMapper {
     CategoryMapper MAPPER = Mappers.getMapper(CategoryMapper.class);
 
     @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getParentCategoryId()))", target = "parentCategoryId")
-    @Mapping(expression = "java(com.quickBite.utils.TextUtils.toObjectId(create.getRestaurantId()))", target = "restaurantId")
     Category mapToPojo(CategoryDto.CreateCategory create);
 
     @Mapping(expression = "java(com.quickBite.utils.DateUtils.getTimeStamp(category.getCreatedAt()))", target = "createdAtTimeStamp")

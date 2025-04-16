@@ -7,11 +7,12 @@ import com.quickBite.primary.pojo.Customer;
 import com.quickBite.primary.pojo.UserAdmin;
 import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.primary.pojo._BaseUser;
-import com.quickBite.primary.repository.CustomerRepository;
 import com.quickBite.security.JwtTokenUtil;
 import com.quickBite.utils.TextUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,9 +26,6 @@ public class AuthService extends _BaseService {
     protected JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    protected CustomerRepository customerRepository;
-
-    @Autowired
     protected CustomerService customerService;
 
     public UserAdmin findByUsername(String userName) throws BadRequestException {
@@ -38,8 +36,8 @@ public class AuthService extends _BaseService {
         return pojo;
     }
 
-    public Customer findByCustomerUsername(String username) throws BadRequestException {
-        Customer customer = customerRepository.findFirstByUsername(username);
+    public Customer findByCustomerUsername(MongoTemplate mongoTemplate, String username) throws BadRequestException {
+        Customer customer = customerService.findFirstByUsername(mongoTemplate, username);
         if (customer == null) {
             throw new BadRequestException("Customer Record Not Exist");
         }
@@ -62,28 +60,30 @@ public class AuthService extends _BaseService {
         return generateAuthTokenAndGetUserDetails(vendor, ipAddress);
     }
 
-    public AuthDto.UserDetails loginCustomer(String userName, String password, String ipAddress) throws BadRequestException {
-        Customer userCustomer = findByCustomerUsername(userName);
+    public AuthDto.UserDetails loginCustomer(ObjectId vendorId, String userName, String password, String ipAddress) throws BadRequestException {
+        MongoTemplate mongoTemplate = getMongoTemplate(vendorId.toString());
+        Customer userCustomer = findByCustomerUsername(mongoTemplate, userName);
         validateUser(userCustomer, password);
         userCustomer.setLastLogin(LocalDateTime.now());
-        customerRepository.save(userCustomer);
+        customerService.save(mongoTemplate, userCustomer);
         return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
     }
 
-    public AuthDto.UserDetails loginOtpCustomer(AuthDto.CustomerOtpLogin login, String ipAddress) throws BadRequestException {
+    public AuthDto.UserDetails loginOtpCustomer(ObjectId vendorId, AuthDto.CustomerOtpLogin login, String ipAddress) throws BadRequestException {
+        Vendor vendor = validateVendor(vendorId);
+        MongoTemplate mongoTemplate = getMongoTemplate(vendorId.toString());
         // Verify Otp And Save Customer If Not Exist And Validate.
-        customerService.validateLoginWithOtp(login);
-        Customer userCustomer = findByCustomerUsername(login.getMobile());
+        customerService.validateLoginWithOtp(mongoTemplate, vendor, login);
+        Customer userCustomer = findByCustomerUsername(mongoTemplate, login.getMobile());
         if (!userCustomer.isActive()) {
             throw new BadRequestException("Customer Id Blocked, Please Contact To Admin");
         }
         userCustomer.setLastLogin(LocalDateTime.now());
-        customerRepository.save(userCustomer);
+        customerService.save(mongoTemplate, userCustomer);
         return generateAuthTokenAndGetUserDetails(userCustomer, ipAddress);
     }
 
     private void validateUser(_BaseUser user, String password) throws BadRequestException {
-
         if (!TextUtils.matchPassword(password, user.getPwdSecure())) {
             throw new BadRequestException("Invalid Credential");
         }
@@ -91,6 +91,14 @@ public class AuthService extends _BaseService {
         if (TextUtils.isEmpty(user.getUniqueKey())) {
             user.setUniqueKey(TextUtils.getUniqueKey());
         }
+    }
+
+    private Vendor validateVendor(ObjectId vendorId) throws BadRequestException {
+        Vendor vendor = vendorRepository.findById(vendorId).orElse(null);
+        if (vendor == null) {
+            throw new BadRequestException("Invalid VendorId Provided");
+        }
+        return vendor;
     }
 
     private AuthDto.UserDetails generateAuthTokenAndGetUserDetails(_BaseUser user, String ipAddress) {
@@ -106,7 +114,13 @@ public class AuthService extends _BaseService {
         bodyPart.put("u-id", user.getId());
         bodyPart.put("u-ty", user.getUserType().toString());
         bodyPart.put("token", token);
+        if (user instanceof Customer customer) {
+            bodyPart.put("vendorId", customer.getVendorId().toString());
+        } else {
+            bodyPart.put("vendorId", "");
+        }
         adminDetail.setSecretKey(jwtTokenUtil.generateToken(bodyPart, user));
+
         return adminDetail;
     }
 

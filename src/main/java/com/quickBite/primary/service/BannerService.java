@@ -3,9 +3,13 @@ package com.quickBite.primary.service;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.dto.BannerDto;
 import com.quickBite.primary.mapper.BannerMapper;
+import com.quickBite.primary.pojo.AppCode;
 import com.quickBite.primary.pojo.Banner;
+import com.quickBite.primary.pojo.CouponCode;
+import com.quickBite.utils.TextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,5 +73,16 @@ public class BannerService extends _BaseService {
             throw new BadRequestException("ecommerce.common.message.record_not_exist");
         }
         return banner;
+    }
+
+    public Object getBannerList(ObjectId restaurantId) throws BadRequestException {
+        AppCode appCode = appCodeRepository.findFirstByRestaurantId(restaurantId);
+        MongoTemplate mongoTemplate = getMongoTemplate(appCode.getVendorId().toString());
+        List<Banner> bannerList = bannerRepository.findByActive(true);
+        if(TextUtils.isEmpty(bannerList)) return null;
+        return bannerList.stream()
+                .map(banner -> BannerMapper.MAPPER.mapToDetailDto(banner))
+                .toList();
+
     }
 }

@@ -52,7 +52,7 @@ public class MenuDataService extends _BaseService {
     }
 
     private Menu generateMenu(MongoTemplate mongoTemplate, ObjectId vendorId, ObjectId restaurantId) {
-        Menu menu = findByRestaurantId(mongoTemplate, vendorId, restaurantId);
+        Menu menu = findByRestaurantId(mongoTemplate, restaurantId);
         if (menu == null) {
             menu = new Menu();
             menu.setVendorId((vendorId));
@@ -129,9 +129,9 @@ public class MenuDataService extends _BaseService {
         return menuItemList;
     }
 
-    private Menu findByRestaurantId(MongoTemplate mongoTemplate, ObjectId vendorId, ObjectId restaurantId) {
+    private Menu findByRestaurantId(MongoTemplate mongoTemplate, ObjectId restaurantId) {
         Query query = new Query()
-                .addCriteria(Criteria.where("vendorId").is(vendorId))
+//                .addCriteria(Criteria.where("vendorId").is(vendorId))
                 .addCriteria(Criteria.where("restaurantId").is(restaurantId));
         return mongoTemplate.findOne(query, Menu.class);
     }
@@ -139,7 +139,17 @@ public class MenuDataService extends _BaseService {
     public List<Menu.MenuItems> getMenu(String appCodeId) throws BadRequestException {
         AppCode appCode = appCodeRepository.findFirstByAppCodeId(appCodeId);
         MongoTemplate mongoTemplate = getMongoTemplate(appCode.getVendorId().toString());
-        Menu menu = findByRestaurantId(mongoTemplate, appCode.getVendorId(), appCode.getRestaurantId());
+        Menu menu = findByRestaurantId(mongoTemplate, appCode.getRestaurantId());
+        if (menu == null) {
+            menu = generateMenu(mongoTemplate, appCode.getVendorId(), appCode.getRestaurantId());
+        }
+        return menu.getMenuItemsListList();
+    }
+
+    public List<Menu.MenuItems> getMenu(ObjectId restaurantId) throws BadRequestException {
+        AppCode appCode = appCodeRepository.findFirstByRestaurantId(restaurantId);
+        MongoTemplate mongoTemplate = getMongoTemplate(appCode.getVendorId().toString());
+        Menu menu = findByRestaurantId(mongoTemplate, restaurantId);
         if (menu == null) {
             menu = generateMenu(mongoTemplate, appCode.getVendorId(), appCode.getRestaurantId());
         }

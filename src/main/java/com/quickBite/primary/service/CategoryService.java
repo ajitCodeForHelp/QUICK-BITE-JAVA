@@ -24,17 +24,18 @@ import static com.quickBite.configuration.SpringBeanContext.getBean;
 @Service
 public class CategoryService extends _BaseService {
 
-    public String save(CategoryDto.CreateCategory request) throws BadRequestException {
+    public String save(ObjectId restaurantId, CategoryDto.CreateCategory request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         Category category = new Category();
         category.setVendorId(loggedInUser.getObjectId());
+        category.setRestaurantId(restaurantId);
         category = CategoryMapper.MAPPER.mapToPojo(request);
         mongoTemplate.save(category);
         return category.getId();
     }
 
-    public void update(String id, CategoryDto.UpdateCategory request) throws BadRequestException {
+    public void update(ObjectId restaurantId, String id, CategoryDto.UpdateCategory request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         Category category = findById(mongoTemplate, id);
@@ -42,31 +43,31 @@ public class CategoryService extends _BaseService {
         mongoTemplate.save(category);
     }
 
-    public CategoryDto.DetailCategory get(String id) throws BadRequestException {
+    public CategoryDto.DetailCategory get(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         Category category = findById(mongoTemplate, id);
         return CategoryMapper.MAPPER.mapToDetailDto(category);
     }
 
-    public List<CategoryDto.DetailCategory> list(String data) throws BadRequestException {
+    public List<CategoryDto.DetailCategory> list(ObjectId restaurantId, String data) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         // Data >  Active | Inactive  | All
         List<Category> list = null;
         if (data.equals("Active")) {
-            list = findByActive(mongoTemplate, true);
+            list = findByActive(mongoTemplate, restaurantId, true);
         } else if (data.equals("Inactive")) {
-            list = findByActive(mongoTemplate, false);
+            list = findByActive(mongoTemplate, restaurantId, false);
         } else {
-            list = findAll(mongoTemplate);
+            list = findAll(mongoTemplate, restaurantId);
         }
         return list.stream()
                 .map(category -> CategoryMapper.MAPPER.mapToDetailDto(category))
                 .collect(Collectors.toList());
     }
 
-    public void activate(String id) throws BadRequestException {
+    public void activate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         Category category = findById(mongoTemplate, id);
@@ -75,7 +76,7 @@ public class CategoryService extends _BaseService {
         mongoTemplate.save(category);
     }
 
-    public void inactivate(String id) throws BadRequestException {
+    public void inactivate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         Category category = findById(mongoTemplate, id);
@@ -84,55 +85,60 @@ public class CategoryService extends _BaseService {
         mongoTemplate.save(category);
     }
 
-    public List<KeyValueDto> categoryKeyValueList() throws BadRequestException {
+    public List<KeyValueDto> categoryKeyValueList(ObjectId restaurantId) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<Category> categoryList = findByActive(mongoTemplate, true);
-        return categoryList.stream().map(category ->
-                CategoryMapper.MAPPER.mapToKeyValueDto(category))
-                .collect(Collectors.toList());
-    }
-
-    public List<KeyValueDto> parentCategoryKeyValueList() throws BadRequestException {
-        Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
-        MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<Category> categoryList = parentCategoryList(mongoTemplate);
+        List<Category> categoryList = findByActive(mongoTemplate, restaurantId, true);
         return categoryList.stream().map(category ->
                         CategoryMapper.MAPPER.mapToKeyValueDto(category))
                 .collect(Collectors.toList());
     }
 
-    public List<KeyValueDto> subCategoryKeyValueList() throws BadRequestException {
+    public List<KeyValueDto> parentCategoryKeyValueList(ObjectId restaurantId) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<Category> categoryList = subCategoryList(mongoTemplate);
+        List<Category> categoryList = parentCategoryList(mongoTemplate, restaurantId);
         return categoryList.stream().map(category ->
                         CategoryMapper.MAPPER.mapToKeyValueDto(category))
                 .collect(Collectors.toList());
     }
 
-    private List<Category> parentCategoryList(MongoTemplate mongoTemplate) {
+    public List<KeyValueDto> subCategoryKeyValueList(ObjectId restaurantId) throws BadRequestException {
+        Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
+        MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
+        List<Category> categoryList = subCategoryList(mongoTemplate, restaurantId);
+        return categoryList.stream().map(category ->
+                        CategoryMapper.MAPPER.mapToKeyValueDto(category))
+                .collect(Collectors.toList());
+    }
+
+    private List<Category> parentCategoryList(MongoTemplate mongoTemplate, ObjectId restaurantId) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(true))
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("parentCategoryId").is(null));
         return mongoTemplate.find(query, Category.class);
     }
 
-    private List<Category> subCategoryList(MongoTemplate mongoTemplate) {
+    private List<Category> subCategoryList(MongoTemplate mongoTemplate, ObjectId restaurantId) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(true))
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("parentCategoryId").ne(null));
         return mongoTemplate.find(query, Category.class);
     }
 
-    private List<Category> findByActive(MongoTemplate mongoTemplate, boolean active) {
+    private List<Category> findByActive(MongoTemplate mongoTemplate, ObjectId restaurantId, boolean active) {
         Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("active").is(active));
         return mongoTemplate.find(query, Category.class);
     }
 
-    private List<Category> findAll(MongoTemplate mongoTemplate) {
-        return mongoTemplate.findAll(Category.class);
+    private List<Category> findAll(MongoTemplate mongoTemplate, ObjectId restaurantId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId));
+        return mongoTemplate.find(query, Category.class);
     }
 
     private Category findById(MongoTemplate mongoTemplate, String id) throws BadRequestException {

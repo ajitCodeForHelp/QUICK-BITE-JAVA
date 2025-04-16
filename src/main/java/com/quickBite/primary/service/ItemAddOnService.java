@@ -25,17 +25,18 @@ import static com.quickBite.configuration.SpringBeanContext.getBean;
 @Service
 public class ItemAddOnService extends _BaseService {
 
-    public String save(ItemAddOnDto.CreateItemAddOn request) throws BadRequestException {
+    public String save(ObjectId restaurantId, ItemAddOnDto.CreateItemAddOn request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         ItemAddOn itemAddOn = new ItemAddOn();
         itemAddOn.setVendorId(loggedInUser.getObjectId());
+        itemAddOn.setRestaurantId(restaurantId);
         itemAddOn = ItemAddOnMapper.MAPPER.mapToPojo(request);
         mongoTemplate.save(itemAddOn);
         return itemAddOn.getId();
     }
 
-    public void update(String id, ItemAddOnDto.UpdateItemAddOn request) throws BadRequestException {
+    public void update(ObjectId restaurantId, String id, ItemAddOnDto.UpdateItemAddOn request) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         ItemAddOn itemAddOn = findById(mongoTemplate, id);
@@ -43,31 +44,31 @@ public class ItemAddOnService extends _BaseService {
         mongoTemplate.save(itemAddOn);
     }
 
-    public ItemAddOnDto.DetailItemAddOn get(String id) throws BadRequestException {
+    public ItemAddOnDto.DetailItemAddOn get(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         ItemAddOn itemAddOn = findById(mongoTemplate, id);
         return ItemAddOnMapper.MAPPER.mapToDetailDto(itemAddOn);
     }
 
-    public List<ItemAddOnDto.DetailItemAddOn> list(String data) throws BadRequestException {
+    public List<ItemAddOnDto.DetailItemAddOn> list(ObjectId restaurantId, String data) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         // Data >  Active | Inactive  | All
         List<ItemAddOn> list = null;
         if (data.equals("Active")) {
-            list = findByActive(mongoTemplate, true);
+            list = findByActive(mongoTemplate, restaurantId, true);
         } else if (data.equals("Inactive")) {
-            list = findByActive(mongoTemplate, false);
+            list = findByActive(mongoTemplate, restaurantId, false);
         } else {
-            list = findAll(mongoTemplate);
+            list = findAll(mongoTemplate, restaurantId);
         }
         return list.stream()
                 .map(itemAddOn -> ItemAddOnMapper.MAPPER.mapToDetailDto(itemAddOn))
                 .collect(Collectors.toList());
     }
 
-    public void activate(String id) throws BadRequestException {
+    public void activate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         ItemAddOn itemAddOn = findById(mongoTemplate, id);
@@ -76,7 +77,7 @@ public class ItemAddOnService extends _BaseService {
         mongoTemplate.save(itemAddOn);
     }
 
-    public void inactivate(String id) throws BadRequestException {
+    public void inactivate(ObjectId restaurantId, String id) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
         ItemAddOn itemAddOn = findById(mongoTemplate, id);
@@ -85,40 +86,44 @@ public class ItemAddOnService extends _BaseService {
         mongoTemplate.save(itemAddOn);
     }
 
-    public List<KeyValueDto> itemAddOnKeyValueList() throws BadRequestException {
+    public List<KeyValueDto> itemAddOnKeyValueList(ObjectId restaurantId) throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<ItemAddOn> itemAddOnList = findByActive(mongoTemplate, true);
+        List<ItemAddOn> itemAddOnList = findByActive(mongoTemplate, restaurantId, true);
         return itemAddOnList.stream().map(itemAddOn ->
                         ItemAddOnMapper.MAPPER.mapToKeyValueDto(itemAddOn))
                 .collect(Collectors.toList());
     }
 
-    public List<KeyValueDto> categoryWiseKeyValueList(List<String> selectedCategoryIds) throws BadRequestException {
-        // Input > Categorys > Selected For A particular item
+    public List<KeyValueDto> categoryWiseKeyValueList(ObjectId restaurantId, List<String> selectedCategoryIds) throws BadRequestException {
+        // Input > Category > Selected For A particular item
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        List<ItemAddOn> itemAddOnList = findByCategoryIds(mongoTemplate, TextUtils.toObjectIds(selectedCategoryIds));
+        List<ItemAddOn> itemAddOnList = findByCategoryIds(mongoTemplate, restaurantId, TextUtils.toObjectIds(selectedCategoryIds));
         return itemAddOnList.stream().map(itemAddOn ->
                         ItemAddOnMapper.MAPPER.mapToKeyValueDto(itemAddOn))
                 .collect(Collectors.toList());
     }
 
-    private List<ItemAddOn> findByCategoryIds(MongoTemplate mongoTemplate, List<ObjectId> categoryIds) {
+    private List<ItemAddOn> findByCategoryIds(MongoTemplate mongoTemplate, ObjectId restaurantId, List<ObjectId> categoryIds) {
         Query query = new Query()
                 .addCriteria(Criteria.where("active").is(true))
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("categoryId").in(categoryIds));
         return mongoTemplate.find(query, ItemAddOn.class);
     }
 
-    private List<ItemAddOn> findByActive(MongoTemplate mongoTemplate, boolean active) {
+    private List<ItemAddOn> findByActive(MongoTemplate mongoTemplate, ObjectId restaurantId, boolean active) {
         Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId))
                 .addCriteria(Criteria.where("active").is(active));
         return mongoTemplate.find(query, ItemAddOn.class);
     }
 
-    private List<ItemAddOn> findAll(MongoTemplate mongoTemplate) {
-        return mongoTemplate.findAll(ItemAddOn.class);
+    private List<ItemAddOn> findAll(MongoTemplate mongoTemplate, ObjectId restaurantId) {
+        Query query = new Query()
+                .addCriteria(Criteria.where("restaurantId").is(restaurantId));
+        return mongoTemplate.find(query, ItemAddOn.class);
     }
 
     private ItemAddOn findById(MongoTemplate mongoTemplate, String id) throws BadRequestException {

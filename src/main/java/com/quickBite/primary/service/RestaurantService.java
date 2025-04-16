@@ -1,5 +1,6 @@
 package com.quickBite.primary.service;
 
+import com.quickBite.bean.KeyValueDto;
 import com.quickBite.exception.BadRequestException;
 import com.quickBite.primary.dto.RestaurantDto;
 import com.quickBite.primary.mapper.RestaurantMapper;
@@ -7,6 +8,7 @@ import com.quickBite.primary.pojo.Restaurant;
 import com.quickBite.primary.pojo.Vendor;
 import com.quickBite.primary.repository.PrimarySequenceRepository;
 import com.quickBite.security.JwtUserDetailsService;
+import com.quickBite.utils.TextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +35,17 @@ public class RestaurantService extends _BaseService {
         restaurant.setVendorId(loggedInUser.getObjectId());
         restaurant.setSeqId(getBean(PrimarySequenceRepository.class).getNextSequenceId(Restaurant.class.getSimpleName() + "_" + loggedInUser.getSeqId()));
         restaurant.setRestaurantTitle(request.getRestaurantTitle());
-        mongoTemplate.save(restaurant);
+        restaurant = mongoTemplate.save(restaurant);
+        // Save RestaurantId In Vendor >>
+        {
+            List<ObjectId> restaurantIdList = loggedInUser.getRestaurantIdList();
+            if (restaurantIdList == null) {
+                restaurantIdList = new ArrayList<>();
+            }
+            restaurantIdList.add(restaurant.getObjectId());
+            loggedInUser.setRestaurantIdList(restaurantIdList);
+            vendorRepository.save(loggedInUser);
+        }
         return restaurant.getId();
     }
 
@@ -94,24 +107,37 @@ public class RestaurantService extends _BaseService {
         restaurant.setModifiedAt(LocalDateTime.now());
         mongoTemplate.save(restaurant);
     }
+
     public String getMyRestaurantId() throws BadRequestException {
         Vendor loggedInUser = (Vendor) getBean(JwtUserDetailsService.class).getLoggedInUser();
         MongoTemplate mongoTemplate = getMongoTemplate(loggedInUser.getId());
-        Restaurant restaurant = findByVendorId(mongoTemplate, loggedInUser.getObjectId());
+        List<Restaurant> restaurantList = findByVendorId(mongoTemplate, loggedInUser.getObjectId());
+        if (TextUtils.isEmpty(restaurantList)) return null;
         // return RestaurantMapper.MAPPER.mapToDetailDto(restaurant);
-        return restaurant.getId();
+        return restaurantList.get(0).getId();
     }
-    private Restaurant findByVendorId(MongoTemplate mongoTemplate, ObjectId vendorId) {
+
+    public List<KeyValueDto> vendorRestaurantKeyList(ObjectId vendorId) throws BadRequestException {
+        Vendor vendor = vendorRepository.findById(vendorId).orElse(null);
+        if (vendor == null) return null;
+        MongoTemplate mongoTemplate = getMongoTemplate(vendor.getId());
+        List<Restaurant> restaurantList = findByVendorId(mongoTemplate, vendor.getObjectId());
+        if (TextUtils.isEmpty(restaurantList)) return null;
+        return restaurantList.stream()
+                .map(restaurant -> RestaurantMapper.MAPPER.mapToKeyValueDto(restaurant))
+                .toList();
+    }
+
+    private List<Restaurant> findByVendorId(MongoTemplate mongoTemplate, ObjectId vendorId) {
         Query query = new Query()
                 .addCriteria(Criteria.where("vendorId").is(vendorId));
-        return mongoTemplate.findOne(query, Restaurant.class);
+        return mongoTemplate.find(query, Restaurant.class);
     }
 
     public List<Restaurant> findRestaurantListByVendorId(MongoTemplate mongoTemplate, ObjectId vendorId) {
         Query query = new Query()
                 .addCriteria(Criteria.where("vendorId").is(vendorId))
-                .addCriteria(Criteria.where("active").is(true))
-                ;
+                .addCriteria(Criteria.where("active").is(true));
         return mongoTemplate.find(query, Restaurant.class);
     }
 

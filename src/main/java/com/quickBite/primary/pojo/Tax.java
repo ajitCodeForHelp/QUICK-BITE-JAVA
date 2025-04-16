@@ -7,10 +7,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Setter
 @Getter
-@Document(collection = "customer")
-public class Customer extends _BaseUser {
+@Document(value = "tax")
+public class Tax extends _BasicEntity {
 
-    private ObjectId adminId;
     private ObjectId vendorId;
-}
+    private ObjectId restaurantId;
 
+    private String title;
+    private String taxPercentage;
+}

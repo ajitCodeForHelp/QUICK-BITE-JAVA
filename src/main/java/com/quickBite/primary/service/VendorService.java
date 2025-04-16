@@ -1,5 +1,6 @@
 package com.quickBite.primary.service;
 
+import com.quickBite.bean.KeyValueDto;
 import com.quickBite.configuration.MongoConfig;
 import com.quickBite.configuration.SpringBeanContext;
 import com.quickBite.exception.BadRequestException;
@@ -92,14 +93,6 @@ public class VendorService extends _BaseService {
         vendorRepository.save(vendor);
     }
 
-    public Vendor findById(String id) throws BadRequestException {
-        Vendor vendor = vendorRepository.findById(new ObjectId(id)).orElse(null);
-        if (vendor == null) {
-            throw new BadRequestException("Vendor Record Not Exist");
-        }
-        return vendor;
-    }
-
     public void createVendor(VendorDto.CreateVendorRequest request) throws BadRequestException {
         // Only Used For General Form Creation > Where Vendor Can Register Itself >
 
@@ -119,6 +112,14 @@ public class VendorService extends _BaseService {
         vendorRepository.save(vendor);
     }
 
+    public Vendor findById(String id) throws BadRequestException {
+        Vendor vendor = vendorRepository.findById(new ObjectId(id)).orElse(null);
+        if (vendor == null) {
+            throw new BadRequestException("Vendor Record Not Exist");
+        }
+        return vendor;
+    }
+
     public void resetPassword(String id, VendorDto.ResetPassword request) throws BadRequestException {
         Vendor vendor = findById(id);
         vendor.setPwdText(request.getPassword());
@@ -132,5 +133,14 @@ public class VendorService extends _BaseService {
             throw new BadRequestException("Vendor Record Not Exist");
         }
         return vendor;
+    }
+
+    public List<KeyValueDto> vendorKeyList() {
+        UserAdmin loggedInUser = (UserAdmin) getBean(JwtUserDetailsService.class).getLoggedInUser();
+        List<Vendor> vendorList = vendorRepository.findByAdminId(loggedInUser.getObjectId());
+        if(TextUtils.isEmpty(vendorList)) return null;
+        return vendorList.stream()
+                .map(vendor -> VendorMapper.MAPPER.mapToKeyValueDto(vendor))
+                .toList();
     }
 }

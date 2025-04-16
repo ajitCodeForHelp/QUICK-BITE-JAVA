@@ -6,6 +6,7 @@ import com.quickBite.primary.controller._BaseController;
 import com.quickBite.primary.dto.VendorDto;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,6 +77,25 @@ public class AdminVendorController extends _BaseController {
         return new ResponseEntity<>(ResponsePacket.builder()
                 .errorCode(0)
                 .message("Password Reset Successfully.")
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/vendor-key-list")
+    public ResponseEntity<ResponsePacket> vendorKeyList() {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("Vendor key Value List.")
+                .responsePacket(vendorService.vendorKeyList())
+                .build(), HttpStatus.OK);
+    }
+
+    @GetMapping("/vendor-restaurant-key-list/{vendorId}")
+    public ResponseEntity<ResponsePacket> vendorRestaurantKeyList(
+            @PathVariable("vendorId") ObjectId vendorId) throws BadRequestException {
+        return new ResponseEntity<>(ResponsePacket.builder()
+                .errorCode(0)
+                .message("Vendor Restaurant key Value List.")
+                .responsePacket(restaurantService.vendorRestaurantKeyList(vendorId))
                 .build(), HttpStatus.OK);
     }
 
